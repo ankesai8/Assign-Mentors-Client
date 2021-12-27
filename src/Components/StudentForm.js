@@ -37,4 +37,3 @@ function StudentTable() {
 }
 
 export default StudentTable;
-ss
