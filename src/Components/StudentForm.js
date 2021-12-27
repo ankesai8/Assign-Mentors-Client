@@ -1,39 +1,82 @@
-import React, { useContext } from "react";
+import React, { useState, useContext } from "react";
+import axios from "axios";
 import { AssignMentorsContext } from "../Context/AssignMentors";
-
-function StudentTable() {
+function StudentForm() {
   const [mentors, setMentors, students, setStudents] =
     useContext(AssignMentorsContext);
-  console.log(setMentors, setStudents);
+  console.log(setMentors);
+  const [name, setname] = useState("");
+  const [batch, setBatch] = useState("");
+  const [assignmentor, setassignMentor] = useState("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("AssignesMentor", assignmentor);
+    console.log(name, batch, assignmentor);
+    const posted_stud = await axios.post(
+      `https://mentor-student-mern-6.herokuapp.com/Students`,
+      { name, batch, mentor: assignmentor }
+    );
+    console.log(posted_stud.data);
+    setStudents([...students, posted_stud.data]);
+    setname("");
+    setBatch("");
+    setassignMentor("");
+  };
+  console.log(mentors);
   return (
-    <div>
-      <h3 className="text-info">Students List</h3>
-      <table className="table table-striped table-hover">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Batch</th>
-            <th scope="col">Mentor</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => {
-            const stud_mentor = mentors.filter(
-              (mentor) => mentor._id === student.mentor
-            );
-            console.log(stud_mentor);
-            return (
-              <tr key={student._id}>
-                <td>{student.name}</td>
-                <td>{student.batch}</td>
-                <td>{stud_mentor[0] ? stud_mentor[0].name : ""}</td>
-              </tr>
-            );
+    <form onSubmit={handleSubmit}>
+      <h4 className="text-info">Student Form</h4>
+      <div className="mb-3">
+        <label htmlFor="name" className="form-label">
+          Student Name
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          id="name"
+          value={name}
+          onChange={(e) => {
+            setname(e.target.value);
+          }}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="batch" className="form-label">
+          Batch
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          id="batch"
+          value={batch}
+          onChange={(e) => {
+            setBatch(e.target.value);
+          }}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="course" className="form-label">
+          Mentor
+        </label>
+        <select
+          class="form-control"
+          aria-label="Default select example"
+          value={assignmentor}
+          onChange={(e) => {
+            setassignMentor(e.target.value);
+          }}
+        >
+          <option value=""></option>
+          {mentors.map((mentor) => {
+            return <option value={mentor._id}>{mentor.name}</option>;
           })}
-        </tbody>
-      </table>
-    </div>
+        </select>
+      </div>
+      <button type="submit" className="btn btn-primary mb-3">
+        Submit
+      </button>
+    </form>
   );
 }
 
-export default StudentTable;
+export default StudentForm;
